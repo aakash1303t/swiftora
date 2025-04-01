@@ -41,7 +41,7 @@ const SupplierProfile = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Invalid token");
 
-      const response = await axios.get(`http://localhost:5000/api/suppliers/me`, {
+      const response = await axios.get(`https://swiftora.vercel.app/api/suppliers/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -113,7 +113,7 @@ const SupplierProfile = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:5000/api/suppliers/${userData.supplierId}`,
+        `https://swiftora.vercel.app/api/suppliers/${userData.supplierId}`,
         {
           name: userData.name,
           contact: userData.contact,
