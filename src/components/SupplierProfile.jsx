@@ -303,7 +303,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
 
-const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // Fetch the API Key from .env file
+const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; 
 const MAP_LIBRARIES = ["places"];
 
 const SupplierProfile = () => {
