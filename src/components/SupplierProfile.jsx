@@ -1,9 +1,309 @@
-import React, { useState, useEffect, useCallback } from "react";
+// import React, { useState, useEffect, useCallback } from "react";
+// import axios from "axios";
+// import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
+// import debounce from "lodash.debounce";
+
+// const API_KEY = "AIzaSyAEpXrSYZihkYrLc45u6ZmYcpK5npiX5qQ"; // Directly assign the API key
+// const MAP_LIBRARIES = ["places"];
+
+// // Helper function to fetch with retry capability
+// const SupplierProfile = () => {
+//   const [userData, setUserData] = useState({
+//     userId: "",
+//     supplierId: "",
+//     username: "",
+//     email: "",
+//     role: "",
+//     name: "",
+//     contact: "",
+//     location: { lat: null, lng: null },
+//     address: "",
+//   });
+
+//   const [loading, setLoading] = useState(true);
+//   const [message, setMessage] = useState("");
+//   const [error, setError] = useState("");
+//   const [apiErrors, setApiErrors] = useState([]);
+
+//   useEffect(() => {
+//     fetchUserProfile();
+//   }, []);
+
+//   useEffect(() => {
+//     if (!userData.location.lat || !userData.location.lng) {
+//       getCurrentLocation();
+//     }
+//   }, [userData.location]);
+
+//   const getCurrentLocation = () => {
+//     if (!navigator.geolocation) {
+//       setError("Geolocation is not supported by this browser.");
+//       return;
+//     }
+
+//     navigator.geolocation.getCurrentPosition(
+//       async (position) => {
+//         const lat = position.coords.latitude;
+//         const lng = position.coords.longitude;
+//         console.log("Got current position:", { lat, lng });
+
+//         try {
+//           const response = await axios.get(
+//             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`
+//           );
+
+//           const formattedAddress =
+//             response.data.results[0]?.formatted_address || "Unknown location";
+
+//           setUserData((prev) => ({
+//             ...prev,
+//             location: { lat, lng },
+//             address: formattedAddress,
+//           }));
+//         } catch (error) {
+//           console.error("Error fetching location address:", error);
+//           setUserData((prev) => ({
+//             ...prev,
+//             location: { lat, lng },
+//             address: "Location detected but address unavailable",
+//           }));
+//         }
+//       },
+//       (err) => {
+//         console.error("Error fetching location:", err);
+//         setError("Unable to fetch location. Please enable location services.");
+//       },
+//       { enableHighAccuracy: true, timeout: 10000 }
+//     );
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setMessage("");
+//     setError("");
+//     setLoading(true);
+
+//     try {
+//       const token = localStorage.getItem("token");
+//       if (!isTokenValid(token)) throw new Error("Invalid token");
+
+//       if (!userData.supplierId) {
+//         setError("Supplier ID not found.");
+//         setLoading(false);
+//         return;
+//       }
+
+//       if (!userData.location.lat || !userData.location.lng) {
+//         setError("Location not available.");
+//         setLoading(false);
+//         return;
+//       }
+
+//       await axios.put(
+//         `https://swiftora.vercel.app/api/suppliers/${userData.supplierId}`,
+//         { name: userData.name, contact: userData.contact },
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+
+//       await axios.put(
+//         "https://swiftora.vercel.app/api/users/update-location",
+//         {
+//           userId: userData.userId,
+//           location: {
+//             lat: userData.location.lat,
+//             lng: userData.location.lng,
+//             address: userData.address,
+//           },
+//         },
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+
+//       await fetchUserProfile();
+//       setMessage("Profile updated successfully!");
+//       setLoading(false);
+//     } catch (err) {
+//       setError("Failed to update profile.");
+//       setLoading(false);
+//     }
+//   };
+//   // Function to display API errors for debugging
+//   const renderApiErrors = () => {
+//     if (apiErrors.length === 0) return null;
+
+//     return (
+//       <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+//         <h3 className="text-sm font-semibold text-yellow-800">Debug Information</h3>
+//         <div className="text-xs text-yellow-700 mt-2">
+//           {apiErrors.map((apiError, index) => (
+//             <div key={index} className="mb-2 pb-2 border-b border-yellow-100">
+//               <p>
+//                 <strong>Endpoint:</strong> {apiError.endpoint}
+//               </p>
+//               <p>
+//                 <strong>Error:</strong> {apiError.error}
+//               </p>
+//               {apiError.details && (
+//                 <p>
+//                   <strong>Details:</strong> {JSON.stringify(apiError.details)}
+//                 </p>
+//               )}
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     );
+//   };
+
+//   return (
+//     <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto mt-6">
+//       <h2 className="text-xl font-semibold text-[#5b2333]">Supplier Profile</h2>
+
+//       {loading ? (
+//         <div className="text-gray-600 py-4">
+//           <p>Loading profile...</p>
+//           <div className="mt-2 w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+//             <div className="h-full bg-[#5b2333] animate-pulse" style={{ width: "100%" }}></div>
+//           </div>
+//         </div>
+//       ) : error ? (
+//         <div className="p-4 bg-red-50 text-red-700 rounded-md border border-red-200">
+//           <p className="font-medium">{error}</p>
+//           <p className="text-sm mt-2">
+//             Please try refreshing the page or contact support if the issue persists.
+//           </p>
+//           <button
+//             onClick={fetchUserProfile}
+//             className="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200"
+//           >
+//             Retry
+//           </button>
+//           {renderApiErrors()}
+//         </div>
+//       ) : (
+//         <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
+//           {message && (
+//             <div className="p-3 bg-green-100 text-green-700 rounded-md border border-green-200">
+//               {message}
+//             </div>
+//           )}
+
+//           {/* Read-only fields from user table */}
+//           <div className="bg-gray-50 p-3 rounded-md">
+//             <h3 className="text-sm font-medium text-gray-700 mb-2">User Information</h3>
+//             {["username", "email", "role"].map((field) => (
+//               <div key={field} className="mb-2 last:mb-0">
+//                 <label className="block text-sm font-medium text-gray-700 capitalize">
+//                   {field}
+//                 </label>
+//                 <input
+//                   type="text"
+//                   name={field}
+//                   value={userData[field]}
+//                   readOnly
+//                   className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
+//                 />
+//               </div>
+//             ))}
+//           </div>
+
+//           {/* Editable fields from supplier table */}
+//           <div className="bg-gray-50 p-3 rounded-md">
+//             <h3 className="text-sm font-medium text-gray-700 mb-2">Supplier Information</h3>
+//             <div className="text-xs text-gray-500 mb-3">
+//               Supplier ID: {userData.supplierId || "Not found"}
+//             </div>
+//             {["name", "contact"].map((field) => (
+//               <div key={field} className="mb-2 last:mb-0">
+//                 <label className="block text-sm font-medium text-gray-700 capitalize">
+//                   {field}
+//                 </label>
+//                 <input
+//                   type="text"
+//                   name={field}
+//                   value={userData[field]}
+//                   onChange={handleChange}
+//                   className="w-full p-2 border rounded-md focus:ring-[#5b2333] focus:border-[#5b2333]"
+//                   required
+//                 />
+//               </div>
+//             ))}
+//           </div>
+
+//           {/* Location field */}
+//           <div className="bg-gray-50 p-3 rounded-md">
+//             <h3 className="text-sm font-medium text-gray-700 mb-2">Location Information</h3>
+//             <div className="mb-2">
+//               <label className="block text-sm font-medium text-gray-700">Address</label>
+//               <input
+//                 type="text"
+//                 name="address"
+//                 value={userData.address}
+//                 onChange={handleChange}
+//                 className="w-full p-2 border rounded-md focus:ring-[#5b2333] focus:border-[#5b2333]"
+//                 placeholder="Enter your location"
+//               />
+//             </div>
+
+//             <div className="text-xs text-gray-500 mb-2">
+//               Coordinates: {userData.location.lat.toFixed(6)}, {userData.location.lng.toFixed(6)}
+//             </div>
+
+//             {/* Google Map */}
+//             {isLoaded ? (
+//               <div className="border rounded-md overflow-hidden mt-2">
+//                 <GoogleMap
+//                   mapContainerStyle={{ width: "100%", height: "300px" }}
+//                   center={
+//                     userData.location.lat ? userData.location : { lat: 28.6139, lng: 77.209 }
+//                   }
+//                   zoom={12}
+//                   onClick={handleMapClick}
+//                 >
+//                   <MarkerF position={userData.location} />
+//                 </GoogleMap>
+//               </div>
+//             ) : (
+//               <div className="h-[300px] bg-gray-100 flex items-center justify-center rounded-md">
+//                 <p className="text-gray-500">Loading map...</p>
+//               </div>
+//             )}
+
+//             <p className="text-xs text-gray-500 mt-2">
+//               Click on the map to set your location or type an address above.
+//             </p>
+//           </div>
+
+//           {/* Form submission button */}
+//           <button
+//             type="submit"
+//             className="w-full p-2 bg-[#5b2333] text-white rounded-md hover:bg-[#4a1c29] disabled:bg-gray-400 disabled:cursor-not-allowed"
+//             disabled={!userData.supplierId || loading}
+//           >
+//             {loading ? "Saving..." : "Save Profile"}
+//           </button>
+
+//           {!userData.supplierId && (
+//             <div className="p-3 bg-yellow-100 text-yellow-700 rounded-md border border-yellow-200">
+//               <p className="font-medium">Supplier profile not found.</p>
+//               <p className="text-sm mt-1">Please contact support to set up your supplier account.</p>
+//             </div>
+//           )}
+
+//           {/* Debugging information */}
+//           {apiErrors.length > 0 && renderApiErrors()}
+//         </form>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default SupplierProfile;
+
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
-import debounce from "lodash.debounce";
 
-const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // Fetch the API Key from .env file
 const MAP_LIBRARIES = ["places"];
 
 const SupplierProfile = () => {
@@ -28,282 +328,177 @@ const SupplierProfile = () => {
     libraries: MAP_LIBRARIES,
   });
 
-  const fetchUserProfile = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No authentication token found.");
-
-      // Step 1: Fetch basic user profile (userId, username, email, role)
-      const userProfileResponse = await axios.get(
-        "https://swiftora.vercel.app/api/users/profile",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const user = userProfileResponse.data;
-      
-      // Initialize userData with user profile data
-      let profileData = {
-        userId: user.userId,
-        username: user.username || "",
-        email: user.email || "",
-        role: user.role || "",
-        supplierId: "",
-        name: "",
-        contact: "",
-        location: { lat: 0, lng: 0 },
-        address: "",
-      };
-
-      // Step 2: Fetch supplier profile (supplierId, name, contact)
-      try {
-        const supplierProfileResponse = await axios.get(
-          "https://swiftora.vercel.app/api/suppliers/profile",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        const supplier = supplierProfileResponse.data;
-        
-        // Update profile data with supplier information
-        profileData.supplierId = supplier.supplierId;
-        profileData.name = supplier.name || "";
-        profileData.contact = supplier.contact || "";
-      } catch (supplierError) {
-        console.error("Error fetching supplier profile:", supplierError);
-      }
-
-      // Step 3: Fetch location data using userId
-      try {
-        const locationResponse = await axios.get(
-          `https://swiftora.vercel.app/api/users/location/${user.userId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        if (locationResponse.data.success && locationResponse.data.location) {
-          profileData.location = locationResponse.data.location;
-          profileData.address = locationResponse.data.location.address || "";
-        }
-      } catch (locationError) {
-        console.warn("⚠ No stored location found, defaulting to current location.");
-        // Will fetch current location in useEffect
-      }
-
-      setUserData(profileData);
-      setLoading(false);
-    } catch (err) {
-      setError("Failed to fetch user data. Please try again later.");
-      console.error("Error fetching user data:", err);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchUserProfile();
   }, []);
 
-  // Fetch current location if no location is set
   useEffect(() => {
-    if ((!userData.location.lat && !userData.location.lng) || 
-        (userData.location.lat === 0 && userData.location.lng === 0)) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-
-          try {
-            const addressResponse = await axios.get(
-              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`
-            );
-
-            const formattedAddress =
-              addressResponse.data.results[0]?.formatted_address || "Unknown location";
-
-            setUserData((prev) => ({
-              ...prev,
-              location: { lat, lng },
-              address: formattedAddress,
-            }));
-          } catch (error) {
-            console.error("Error fetching accurate location:", error);
-            setUserData((prev) => ({
-              ...prev,
-              location: { lat, lng },
-            }));
-          }
-        },
-        (err) => console.error("Error fetching location:", err),
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
+    if (!userData.location.lat || !userData.location.lng) {
+      getCurrentLocation();
     }
   }, [userData.location]);
 
-  const handleChange = (e) => {
-    setUserData({ ...userData, [e.target.name]: e.target.value });
-  };
-
-  const handleMapClick = async (event) => {
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
-    setUserData((prev) => ({ ...prev, location: { lat, lng } }));
-
+  // Fetch user profile data
+  const fetchUserProfile = async () => {
     try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`
-      );
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("User not authenticated");
 
-      if (response.data.results[0]) {
-        setUserData((prev) => ({ ...prev, address: response.data.results[0].formatted_address }));
-      }
-    } catch (error) {
-      console.error("Error fetching address:", error);
+      const response = await axios.get("https://swiftora.vercel.app/api/users/profile", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setUserData(response.data);
+    } catch (err) {
+      setError("Failed to fetch user profile.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleAddressChange = useCallback(
-    debounce(async (address) => {
-      if (!address) return;
-      try {
-        const response = await axios.get(
-          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${API_KEY}`
-        );
-        if (response.data.results[0]) {
-          const { lat, lng } = response.data.results[0].geometry.location;
-          setUserData((prev) => ({ ...prev, location: { lat, lng } }));
+  // Get current location using Geolocation API
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        console.log("Got current position:", { lat, lng });
+
+        try {
+          const response = await axios.get(
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`
+          );
+
+          const formattedAddress = response.data.results[0]?.formatted_address || "Unknown location";
+
+          setUserData((prev) => ({
+            ...prev,
+            location: { lat, lng },
+            address: formattedAddress,
+          }));
+        } catch (error) {
+          console.error("Error fetching location address:", error);
+          setUserData((prev) => ({
+            ...prev,
+            location: { lat, lng },
+            address: "Location detected but address unavailable",
+          }));
         }
-      } catch (error) {
-        console.error("Error fetching location from address:", error);
-      }
-    }, 1000),
-    []
-  );
+      },
+      (err) => {
+        console.error("Error fetching location:", err);
+        setError("Unable to fetch location. Please enable location services.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
-  useEffect(() => {
-    handleAddressChange(userData.address);
-  }, [userData.address, handleAddressChange]);
-
+  // Update supplier profile including location
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setError("");
+    setLoading(true);
 
     try {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("No authentication token found.");
+      if (!token) throw new Error("Invalid token");
 
-      // Only update supplier info if supplierId exists
-      if (userData.supplierId) {
-        // Update supplier name and contact
-        await axios.put(
-          `https://swiftora.vercel.app/api/suppliers/${userData.supplierId}`,
-          { name: userData.name, contact: userData.contact },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      } else {
-        throw new Error("Supplier ID not found. Cannot update supplier information.");
+      if (!userData.supplierId) {
+        setError("Supplier ID not found.");
+        setLoading(false);
+        return;
       }
 
-      // Update user location
+      if (!userData.location.lat || !userData.location.lng) {
+        setError("Location not available.");
+        setLoading(false);
+        return;
+      }
+
+      // Update supplier details including location
       await axios.put(
-        "https://swiftora.vercel.app/api/users/update-location",
-        { 
-          userId: userData.userId, 
-          location: userData.location, 
-          address: userData.address 
+        `https://swiftora.vercel.app/api/suppliers/${userData.supplierId}`,
+        {
+          name: userData.name,
+          contact: userData.contact,
+          location: {
+            lat: userData.location.lat,
+            lng: userData.location.lng,
+            address: userData.address,
+          },
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // After successful update, refresh the data to show updated values
-      fetchUserProfile();
-      
+      await fetchUserProfile();
       setMessage("Profile updated successfully!");
     } catch (err) {
-      console.error("Error updating profile:", err);
-      setError("Failed to update profile. " + (err.response?.data?.message || err.message));
+      setError("Failed to update profile.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (!isLoaded) return <div>Loading Map...</div>;
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto mt-6">
-      <h2 className="text-xl font-semibold text-[#5b2333]">Supplier Profile</h2>
+    <div>
+      <h2>Supplier Profile</h2>
 
-      {loading ? (
-        <p className="text-gray-600">Loading profile...</p>
-      ) : error ? (
-        <p className="text-red-500">{error}</p>
-      ) : (
-        <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
-          {message && <div className="p-2 bg-green-100 text-green-700 rounded">{message}</div>}
-          
-          {/* Read-only fields from user table */}
-          {["username", "email", "role"].map((field) => (
-            <div key={field}>
-              <label className="block text-sm font-medium text-gray-700 capitalize">{field}</label>
-              <input
-                type="text"
-                name={field}
-                value={userData[field]}
-                readOnly
-                className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
-              />
-            </div>
-          ))}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {message && <p style={{ color: "green" }}>{message}</p>}
+      {loading && <p>Loading...</p>}
 
-          {/* Editable fields from supplier table */}
-          {["name", "contact"].map((field) => (
-            <div key={field}>
-              <label className="block text-sm font-medium text-gray-700 capitalize">{field}</label>
-              <input
-                type="text"
-                name={field}
-                value={userData[field]}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md focus:ring-[#5b2333] focus:border-[#5b2333]"
-                required
-              />
-            </div>
-          ))}
+      <form onSubmit={handleSubmit}>
+        <label>
+          Name:
+          <input
+            type="text"
+            value={userData.name}
+            onChange={(e) => setUserData({ ...userData, name: e.target.value })}
+          />
+        </label>
 
-          {/* Location field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Location</label>
-            <input
-              type="text"
-              name="address"
-              value={userData.address}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter your location"
-            />
-          </div>
+        <label>
+          Contact:
+          <input
+            type="text"
+            value={userData.contact}
+            onChange={(e) => setUserData({ ...userData, contact: e.target.value })}
+          />
+        </label>
 
-          {/* Google Map */}
-          {isLoaded && (
-            <GoogleMap 
-              mapContainerStyle={{ width: "100%", height: "300px" }} 
-              center={userData.location.lat ? userData.location : { lat: 28.6139, lng: 77.2090 }} 
-              zoom={12} 
-              onClick={handleMapClick}
-            >
-              <MarkerF position={userData.location} />
-            </GoogleMap>
+        <label>
+          Address:
+          <input type="text" value={userData.address} readOnly />
+        </label>
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Updating..." : "Update Profile"}
+        </button>
+      </form>
+
+      {/* Google Map with marker */}
+      <div style={{ width: "100%", height: "400px", marginTop: "20px" }}>
+        <GoogleMap
+          center={{
+            lat: userData.location?.lat || 0,
+            lng: userData.location?.lng || 0,
+          }}
+          zoom={12}
+          mapContainerStyle={{ width: "100%", height: "100%" }}
+        >
+          {userData.location?.lat && userData.location?.lng && (
+            <MarkerF position={{ lat: userData.location.lat, lng: userData.location.lng }} />
           )}
-
-          {/* Form submission button */}
-          <button 
-            type="submit" 
-            className="w-full p-2 bg-[#5b2333] text-white rounded-md hover:bg-[#4a1c29]"
-            disabled={!userData.supplierId}
-          >
-            Save Profile
-          </button>
-          
-          {!userData.supplierId && (
-            <p className="text-yellow-600 text-sm">
-              Supplier profile not found. Please contact support.
-            </p>
-          )}
-        </form>
-      )}
+        </GoogleMap>
+      </div>
     </div>
   );
 };
