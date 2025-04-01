@@ -122,7 +122,7 @@ const SupplierProfile = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log("Update response:", response.data);
+      // console.log("Update response:", response.data);
       setMessage("Profile updated successfully!");
       setUserData((prev) => ({ ...prev, location: editedLocation }));
       setIsEditing(false);
