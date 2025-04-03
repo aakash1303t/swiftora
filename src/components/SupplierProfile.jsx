@@ -16,7 +16,6 @@ const SupplierProfile = () => {
     name: "",
     contact: "",
     location: null,
-    address: "",
   });
 
   const [loading, setLoading] = useState(true);
@@ -24,6 +23,7 @@ const SupplierProfile = () => {
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedLocation, setEditedLocation] = useState(null);
+  const [address, setAddress] = useState("");
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -46,11 +46,11 @@ const SupplierProfile = () => {
       });
 
       if (response.data) {
-        setUserData({
-          ...response.data,
-          location: response.data.location || null,
-        });
-        setEditedLocation(response.data.location || null);
+        const location = response.data.location || null;
+        setUserData({ ...response.data, location });
+        setEditedLocation(location);
+
+        if (location) reverseGeocode(location.lat, location.lng);
       }
       setLoading(false);
     } catch (err) {
@@ -64,7 +64,41 @@ const SupplierProfile = () => {
     if (isEditing) {
       const lat = e.latLng.lat();
       const lng = e.latLng.lng();
-      setEditedLocation({ lat, lng });
+      const newLocation = { lat, lng };
+      setEditedLocation(newLocation);
+      reverseGeocode(lat, lng);
+    }
+  };
+
+  const reverseGeocode = async (lat, lng) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`
+      );
+      const data = await response.json();
+      if (data.results.length > 0) {
+        setAddress(data.results[0].formatted_address);
+      } else {
+        setAddress("Address not found");
+      }
+    } catch (err) {
+      console.error("Reverse geocoding failed:", err);
+    }
+  };
+
+  const handleAddressChange = async (e) => {
+    setAddress(e.target.value);
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(e.target.value)}&key=${API_KEY}`
+      );
+      const data = await response.json();
+      if (data.results.length > 0) {
+        const { lat, lng } = data.results[0].geometry.location;
+        setEditedLocation({ lat, lng });
+      }
+    } catch (err) {
+      console.error("Geocoding failed:", err);
     }
   };
 
@@ -74,16 +108,13 @@ const SupplierProfile = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           setEditedLocation({ lat: latitude, lng: longitude });
+          reverseGeocode(latitude, longitude);
         },
         (error) => {
           console.error("Error getting location:", error);
           setError("Unable to fetch location.");
         },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0,
-        }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } else {
       setError("Geolocation is not supported by your browser.");
@@ -112,7 +143,7 @@ const SupplierProfile = () => {
         return;
       }
 
-      const response = await axios.put(
+      await axios.put(
         `https://swiftora.vercel.app/api/suppliers/${userData.supplierId}`,
         {
           name: userData.name,
@@ -122,24 +153,23 @@ const SupplierProfile = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // console.log("Update response:", response.data);
       setMessage("Profile updated successfully!");
-      setUserData((prev) => ({ ...prev, location: editedLocation }));
+      setUserData((prev) => ({
+        ...prev,
+        location: editedLocation,
+      }));
       setIsEditing(false);
-      setLoading(false);
     } catch (err) {
       console.error("Error updating profile:", err);
       setError("Failed to update profile.");
+    } finally {
       setLoading(false);
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -154,85 +184,45 @@ const SupplierProfile = () => {
         <div className="mt-4 space-y-4">
           {message && <div className="p-2 bg-green-100 text-green-700 rounded">{message}</div>}
 
-          {/* Read-Only Profile View */}
+          {["username", "email", "name", "contact"].map((field) => (
+            <div key={field}>
+              <label className="block text-sm font-medium text-gray-700 capitalize">{field}</label>
+              {!isEditing ? (
+                <p className="text-gray-900">{userData[field] || "N/A"}</p>
+              ) : (
+                <input type="text" name={field} value={userData[field]} onChange={handleChange} className="w-full p-2 border rounded-md" required />
+              )}
+            </div>
+          ))}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Location</label>
+            {!isEditing ? (
+              <p className="text-gray-900">{address || "Location not set"}</p>
+            ) : (
+              <input type="text" value={address} onChange={handleAddressChange} className="w-full p-2 border rounded-md" placeholder="Enter address" />
+            )}
+          </div>
+
+          {isLoaded && (
+            <GoogleMap
+              mapContainerStyle={mapContainerStyle}
+              center={editedLocation || userData.location || { lat: 0, lng: 0 }}
+              zoom={15}
+              onClick={isEditing ? handleMapClick : undefined}
+            >
+              {(editedLocation || userData.location) && <MarkerF position={editedLocation || userData.location} />}
+            </GoogleMap>
+          )}
+
           {!isEditing ? (
-            <>
-              {["username", "email", "name", "contact"].map((field) => (
-                <div key={field}>
-                  <label className="block text-sm font-medium text-gray-700 capitalize">{field}</label>
-                  <p className="text-gray-900">{userData[field] || "N/A"}</p>
-                </div>
-              ))}
-
-              {userData.location && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Location</label>
-                  <GoogleMap mapContainerStyle={mapContainerStyle} center={userData.location} zoom={15}>
-                    <MarkerF position={userData.location} />
-                  </GoogleMap>
-                </div>
-              )}
-
-              <button
-                type="button"
-                onClick={() => setIsEditing(true)}
-                className="w-full p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
-              >
-                Edit Profile
-              </button>
-            </>
+            <button onClick={() => setIsEditing(true)} className="w-full p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">
+              Edit Profile
+            </button>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {["name", "contact"].map((field) => (
-                <div key={field}>
-                  <label className="block text-sm font-medium text-gray-700 capitalize">{field}</label>
-                  <input
-                    type="text"
-                    name={field}
-                    value={userData[field]}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded-md focus:ring-[#5b2333] focus:border-[#5b2333]"
-                    required
-                  />
-                </div>
-              ))}
-
-              {/* Location Editing */}
-              {isLoaded && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleAccurateLocation}
-                    className="mb-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  >
-                    Get Current Location
-                  </button>
-
-                  {editedLocation && (
-                    <GoogleMap
-                      mapContainerStyle={mapContainerStyle}
-                      center={editedLocation}
-                      zoom={15}
-                      onClick={handleMapClick}
-                    >
-                      <MarkerF position={editedLocation} />
-                    </GoogleMap>
-                  )}
-                </>
-              )}
-
-              <button type="submit" className="w-full p-2 bg-[#5b2333] text-white rounded-md hover:bg-[#4a1c29]">
-                Update Profile
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="w-full p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-            </form>
+            <button type="submit" onClick={handleSubmit} className="w-full p-2 bg-[#5b2333] text-white rounded-md hover:bg-[#4a1c29]">
+              Update Profile
+            </button>
           )}
         </div>
       )}
