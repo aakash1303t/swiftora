@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { 
   FaHome, FaStore, FaWarehouse, FaClipboardList, 
-  FaBox, FaBell, FaUser, FaSignOutAlt, FaBars, FaTimes 
+  FaBox, FaBell, FaUser, FaSignOutAlt, FaBars, FaTimes, FaBarcode 
 } from "react-icons/fa";
 import logo from "../assets/logo1.png"; // Ensure path is correct
 
@@ -40,6 +40,7 @@ const Sidebar = () => {
             { to: "/supplier-warehouses", icon: <FaWarehouse className="text-xl" />, label: "My Warehouses" },
             { to: "/my-orders", icon: <FaClipboardList className="text-xl" />, label: "My Orders" },
             { to: "/inventory", icon: <FaBox className="text-xl" />, label: "Current Inventory" },
+            { to: "/barcode-scanner", icon: <FaBarcode className="text-xl" />, label: "Barcode Scanner" },
             { to: "/supplier-notifications", icon: <FaBell className="text-xl" />, label: "Notifications" },
           ].map(({ to, icon, label }) => (
             <NavLink

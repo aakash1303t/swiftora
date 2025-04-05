@@ -7,6 +7,7 @@ import Orders from "./pages/Orders";
 import SupplierProfilePage from "./pages/SupplierProfilePage";
 import SupplierDashboard from "./pages/SupplierDashboard";
 import SupermarketDashboard from "./pages/SupermarketDashboard";
+import BarcodeScanner from "./pages/BarcodeScanner";
 import Login from "./pages/Login";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <Route path="/supermarket-dashboard" element={<SupermarketDashboard />} />
       <Route path="/my-supermarkets" element={<MySupermarkets />} />
       <Route path="/inventory" element={<CurrentInventoryPage />} />
+      <Route path="/barcode-scanner" element={<BarcodeScanner />} />
       <Route path="/my-orders" element={<Orders />} />
       <Route path="/supplier-profile" element={<SupplierProfilePage />} />
     </Routes>
