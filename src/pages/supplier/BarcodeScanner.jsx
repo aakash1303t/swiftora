@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BarcodeReader } from 'dynamsoft-javascript-barcode';
 
-
 const BarcodeScanner = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
