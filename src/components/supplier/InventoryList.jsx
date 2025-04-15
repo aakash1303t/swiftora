@@ -8,7 +8,7 @@ const InventoryList = ({ inventoryItems }) => {
         {inventoryItems.length} items in stock, 1 low stock alert
       </p>
 
-      {/* Inventory List */}
+      {/* Inventory List */} 
       <div className="mt-4">
         {inventoryItems.map((item) => (
           <div key={item.id} className="flex justify-between items-center py-3 border-b">
