@@ -11,7 +11,7 @@ const CurrentInventoryPage = () => {
     
   return (
     <div className="flex min-h-screen bg-[#f7f4f3]">
-      {/* Sidebar */}
+      {/* Sidebar */} 
       <Sidebar />
 
       {/* Main Content */}

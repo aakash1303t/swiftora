@@ -7,7 +7,7 @@ const CurrentInventory = ({ inventoryItems }) => {
       <p className="text-sm text-gray-700 mt-2">
         {inventoryItems.length} items in stock, 1 low stock alert
       </p>
-
+ 
       {/* Inventory List */}
       <div className="mt-4">
         {inventoryItems.map((item) => (

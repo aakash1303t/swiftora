@@ -18,7 +18,7 @@ const SupplierDashboard = () => {
     { id: "#ORD124", product: "Fresh Milk", quantity: 80, date: "March 10, 2025", status: "Processing" },
     { id: "#ORD125", product: "Whole Grain Bread", quantity: 50, date: "March 8, 2025", status: "Canceled" }
   ];
-
+ 
   return (
     <div className="flex min-h-screen bg-[#f7f4f3]">
       {/* Sidebar */}

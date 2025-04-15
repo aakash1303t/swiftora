@@ -9,7 +9,7 @@ const SupplierProfilePage = () => {
   return (
     <div className="flex min-h-screen bg-[#f7f4f3]">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar /> 
 
       {/* Main Content */}
       <div className="flex-1 p-4 md:p-6 transition-all duration-300">

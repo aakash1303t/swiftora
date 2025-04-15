@@ -11,7 +11,7 @@ const supermarkets = [
     paymentStatus: "Up to date",
     status: "Active",
     statusColor: "bg-green-100 text-green-700",
-  },
+  }, 
   {
     name: "SuperValue",
     orders: 98,

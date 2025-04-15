@@ -9,7 +9,7 @@ import logo from "../../assets/logo1.png"; // Ensure path is correct
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  return (
+  return ( 
     <>
       {/* Mobile Hamburger Menu Button (Moved to Right) */}
       <button

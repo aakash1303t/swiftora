@@ -11,7 +11,7 @@ const Registration = () => {
     email: "",
     password: "",
     role: "supplier", // Default role
-  });
+  }); 
 
   const navigate = useNavigate();
 
