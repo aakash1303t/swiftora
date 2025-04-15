@@ -4,6 +4,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import logo from "../assets/logo1.png";
+
 const Registration = () => {
   const [formData, setFormData] = useState({
     username: "",
