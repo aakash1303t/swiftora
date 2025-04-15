@@ -1,6 +1,6 @@
 import React from 'react'
-import Sidebar from "../../components/supplier/Sidebar";
-import MyOrders from "../../components/supplier/MyOrders";
+import Sidebar from "../components/Sidebar";
+import MyOrders from "../components/MyOrders";
 const Orders = () => {
     const orders = [
         { id: "#ORD123", product: "Organic Apples", quantity: 120, date: "March 12, 2025", status: "Delivered" },
@@ -10,7 +10,7 @@ const Orders = () => {
   return (
     <div className="flex min-h-screen bg-[#f7f4f3]">
       {/* Sidebar */}
-      <Sidebar /> 
+      <Sidebar />
 
       {/* Main Content */}
       <div className="flex-1 p-4 md:p-6 transition-all duration-300">

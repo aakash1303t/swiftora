@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BarcodeReader } from 'dynamsoft-javascript-barcode';
 
+
 const BarcodeScanner = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -9,7 +10,7 @@ const BarcodeScanner = () => {
   const readerRef = useRef(null);
 
   useEffect(() => {
-    const loadDynamsoft = async () => { 
+    const loadDynamsoft = async () => {
       try {
         BarcodeReader.license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==";
         BarcodeReader.engineResourcePath = "https://unpkg.com/dynamsoft-javascript-barcode@latest/dist/";

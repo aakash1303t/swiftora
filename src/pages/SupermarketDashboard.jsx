@@ -6,4 +6,4 @@ const SupermarketDashboard = () => {
   )
 }
 
-export default SupermarketDashboard 
+export default SupermarketDashboard

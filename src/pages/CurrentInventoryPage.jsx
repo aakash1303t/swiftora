@@ -1,6 +1,6 @@
 import React from 'react';
-import Sidebar from "../../components/supplier/Sidebar";
-import CurrentInventory from "../../components/supplier/CurrentInventory";
+import Sidebar from "../components/Sidebar";
+import CurrentInventory from "../components/CurrentInventory";
 const CurrentInventoryPage = () => {
 
     const inventoryItems = [
@@ -11,7 +11,7 @@ const CurrentInventoryPage = () => {
     
   return (
     <div className="flex min-h-screen bg-[#f7f4f3]">
-      {/* Sidebar */} 
+      {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content */}

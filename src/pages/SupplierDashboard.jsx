@@ -1,8 +1,8 @@
 import React from "react";
-import Sidebar from "../../components/supplier/Sidebar";
-import SupermarketsSupplied from "../../components/supplier/SupermarketsSupplied";
-import CurrentInventory from "../../components/supplier/CurrentInventory";
-import MyOrders from "../../components/supplier/MyOrders";
+import Sidebar from "../components/Sidebar";
+import SupermarketsSupplied from "../components/SupermarketsSupplied";
+import CurrentInventory from "../components/CurrentInventory";
+import MyOrders from "../components/MyOrders";
 import { ShoppingCart, Box, Users } from "react-feather";
 
 const SupplierDashboard = () => {
@@ -18,7 +18,7 @@ const SupplierDashboard = () => {
     { id: "#ORD124", product: "Fresh Milk", quantity: 80, date: "March 10, 2025", status: "Processing" },
     { id: "#ORD125", product: "Whole Grain Bread", quantity: 50, date: "March 8, 2025", status: "Canceled" }
   ];
- 
+
   return (
     <div className="flex min-h-screen bg-[#f7f4f3]">
       {/* Sidebar */}

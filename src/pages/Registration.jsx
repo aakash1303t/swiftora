@@ -11,7 +11,7 @@ const Registration = () => {
     email: "",
     password: "",
     role: "supplier", // Default role
-  }); 
+  });
 
   const navigate = useNavigate();
 
@@ -100,8 +100,8 @@ const Registration = () => {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg"
               >
-                <option value="supplier">Supplier</option>
-                <option value="supermarket">Supermarket</option>
+                <option value="Supplier">Supplier</option>
+                <option value="Supermarket">Supermarket</option>
               </select>
             </div>
 

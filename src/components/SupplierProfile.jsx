@@ -13,7 +13,7 @@ const SupplierProfile = () => {
     username: "",
     email: "",
     role: "",
-    name: "", 
+    name: "",
     contact: "",
     location: null,
   });

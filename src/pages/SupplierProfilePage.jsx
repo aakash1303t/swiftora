@@ -1,7 +1,7 @@
 import React from 'react'
-import Sidebar from "../../components/supplier/Sidebar";
+import Sidebar from "../components/Sidebar";
 import { LoadScript } from "@react-google-maps/api";
-import SupplierProfile from '../../components/supplier/SupplierProfile'
+import SupplierProfile from '../components/SupplierProfile'
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const MAP_LIBRARIES = ["places"];
@@ -9,7 +9,7 @@ const SupplierProfilePage = () => {
   return (
     <div className="flex min-h-screen bg-[#f7f4f3]">
       {/* Sidebar */}
-      <Sidebar /> 
+      <Sidebar />
 
       {/* Main Content */}
       <div className="flex-1 p-4 md:p-6 transition-all duration-300">

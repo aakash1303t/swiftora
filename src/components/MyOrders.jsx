@@ -7,7 +7,7 @@ const MyOrders = ({ orders }) => {
       <p className="text-sm text-gray-700 mt-2">
         {orders.length} total orders placed.
       </p>
- 
+
       {/* Orders List */}
       <div className="mt-4">
         {orders.map((order) => (
